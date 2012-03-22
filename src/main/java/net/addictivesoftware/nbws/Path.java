@@ -2,6 +2,8 @@ package net.addictivesoftware.nbws;
 
 import org.jboss.netty.handler.codec.http.HttpMethod;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -12,10 +14,14 @@ public class Path {
     private HttpMethod httpMethod;
     private String path;
     private String executableMethod;
-    private String regex;
+    private Pattern regexPattern;
     private List<String> params = new ArrayList<String>();
+    private List<String> paramValues = new ArrayList<String>();
 
     private static String paramFindPattern = "\\{([a-zA-Z]+)\\}";
+    private static String paramValuePattern = "([a-zA-Z0-9]+)";
+    private static String wildcardFindPattern = "\\*";
+    private static String wildcardValuePattern = ".*";
 
     public Path(HttpMethod httpMethod, String path, String executableMethod) {
         setHttpMethod(httpMethod);
@@ -36,8 +42,15 @@ public class Path {
     }
     
     public boolean match(String method, String uri) {
-        //TODO
-        return false;
+        boolean result = false;
+        if (method.equals("*")
+                || getHttpMethod().toString().equals(method)
+                || getHttpMethod().toString().equals("*")) {
+
+            Matcher m = this.regexPattern.matcher(uri);
+            return m.matches();
+        }
+        return result;
     }
     
     
@@ -46,7 +59,7 @@ public class Path {
     }
 
     public void setHttpMethod(HttpMethod method) {
-        this.httpMethod = httpMethod;
+        this.httpMethod = method;
     }
 
     public String getPath() {
@@ -69,10 +82,24 @@ public class Path {
     private void extractParamsAndRegEx(String path) {
         Pattern p = Pattern.compile(paramFindPattern);
         Matcher m = p.matcher(path);
-        while (m.find()) {
-            params.add(path.substring(m.start(), m.end()));
-        }
+        path = "^" + m.replaceAll(paramValuePattern) + "$";
 
-        path.replaceAll(paramFindPattern, paramFindPattern);
+        p = Pattern.compile(wildcardFindPattern);
+        m = p.matcher(path);
+        path = m.replaceAll(wildcardValuePattern);
+        
+        regexPattern = Pattern.compile(path);
+    }
+    
+    public <T> T invoke(T t) {
+        try {
+            Class clazz = Class.forName(executableMethod.split(".")[0]);
+            Method method = clazz.getMethod(executableMethod.split(".")[1], Object.class);
+
+            return (T)method.invoke(null, paramValues);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

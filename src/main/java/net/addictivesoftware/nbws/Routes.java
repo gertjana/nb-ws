@@ -10,22 +10,31 @@ import java.util.List;
 public class Routes {
     private List<Path> paths = new ArrayList<Path>();
 
-    public List<Path> parse() throws IOException {
-        List<Path> result = new ArrayList<Path>();
-        InputStream is = this.getClass().getResourceAsStream("routes");
+    public Routes() {
+        this("/routes");
+    }
+
+    public Routes(String routeFile) {
+        InputStream is = this.getClass().getResourceAsStream(routeFile);
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
             String line;
             while ((line = br.readLine()) != null)   {
-                if (!line.startsWith("#")) {
-                    result.add(Path.parse(line));
+                if (!(line.startsWith("#") || line.trim().equals(""))) {
+                    paths.add(Path.parse(line));
                 }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         } finally {
-            is.close();
+            try {
+                if (is != null) {
+                    is.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-        
-        return result;
     }
     
     public Path getPathForUri(String method, String uri) {
