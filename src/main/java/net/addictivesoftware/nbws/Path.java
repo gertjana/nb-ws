@@ -1,11 +1,10 @@
 package net.addictivesoftware.nbws;
 
 import org.jboss.netty.handler.codec.http.HttpMethod;
+import org.jboss.netty.handler.codec.http.HttpRequest;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,11 +14,10 @@ public class Path {
     private String path;
     private String executableMethod;
     private Pattern regexPattern;
-    private List<String> params = new ArrayList<String>();
-    private List<String> paramValues = new ArrayList<String>();
+    private LinkedList<Object> paramValues = new LinkedList<Object>();
 
     private static String paramFindPattern = "\\{([a-zA-Z]+)\\}";
-    private static String paramValuePattern = "([a-zA-Z0-9]+)";
+    private static String paramValuePattern = "([a-zA-Z0-9@. ]+)";
     private static String wildcardFindPattern = "\\*";
     private static String wildcardValuePattern = ".*";
 
@@ -42,15 +40,18 @@ public class Path {
     }
     
     public boolean match(String method, String uri) {
-        boolean result = false;
-        if (method.equals("*")
-                || getHttpMethod().toString().equals(method)
+        if (getHttpMethod().toString().equals(method)
                 || getHttpMethod().toString().equals("*")) {
 
             Matcher m = this.regexPattern.matcher(uri);
-            return m.matches();
+            if (m.matches()) {
+                for (int i=1;i<=m.groupCount();i++) {
+                    paramValues.add(m.group(i));
+                }
+                return true;
+            }
         }
-        return result;
+        return false;
     }
     
     
@@ -83,7 +84,7 @@ public class Path {
         Pattern p = Pattern.compile(paramFindPattern);
         Matcher m = p.matcher(path);
         path = "^" + m.replaceAll(paramValuePattern) + "$";
-
+        
         p = Pattern.compile(wildcardFindPattern);
         m = p.matcher(path);
         path = m.replaceAll(wildcardValuePattern);
@@ -91,15 +92,36 @@ public class Path {
         regexPattern = Pattern.compile(path);
     }
     
-    public <T> T invoke(T t) {
+    public <T> T invoke(HttpRequest request, Class<T> cls) {
         try {
-            Class clazz = Class.forName(executableMethod.split(".")[0]);
-            Method method = clazz.getMethod(executableMethod.split(".")[1], Object.class);
+            String[] executable = executableMethod.split("\\.", 2);
+            Class[] paramTypes = new Class[paramValues.size()+1];
 
-            return (T)method.invoke(null, paramValues);
+            paramTypes[0] = HttpRequest.class;
+            int cnt=1;
+            for (Object paramValue : paramValues) {
+                paramTypes[cnt] = paramValue.getClass();
+                cnt++;
+            }
+            
+            paramValues.addFirst(request);
+
+            Class clazz = Class.forName(executable[0]);
+            Method method = clazz.getMethod(executable[1], paramTypes);
+            return cls.cast(method.invoke(null, paramValues.toArray()));
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
+    
+    public String toString() {
+        return String.format("%s {%s, %s, %s, %s}",
+                getClass().getSimpleName(),
+                getHttpMethod(),
+                getPath(),
+                getExecutableMethod(),
+                paramValues);
+    }
+    
 }
