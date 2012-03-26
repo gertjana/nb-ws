@@ -25,9 +25,10 @@ public class TestRoutes {
         Assert.assertNotNull(path);
         Assert.assertEquals("Default.refuse", path.getExecutableMethod());
 
-        path = r.getPathForUri("GET", "/user/gertjan.assies%40gmail.com/test");
+        path = r.getPathForUri("POST", "/user/theo@test.com/Theo Tester");
         Assert.assertNotNull(path);
         Assert.assertEquals("UserApi.registerUser", path.getExecutableMethod());
+
     }
 
     @Test
@@ -38,4 +39,20 @@ public class TestRoutes {
         Matcher m = p.matcher(uri);
         Assert.assertTrue(m.matches());
     }
+    
+    @Test
+    public void testInvokeMethod() {
+        Routes r = new Routes("/routes");
+        Path path = r.getPathForUri("GET", "/user/4");
+        String result = path.invoke(new MockHttpRequest(), String.class);
+        System.out.println(result);
+        
+        path = r.getPathForUri("POST", "/user/theo.tester@test.com/Theo Tester");
+        result = path.invoke(new MockHttpRequest(), String.class);
+        System.out.println(result);
+        
+    }
+    
+    
+    
 }

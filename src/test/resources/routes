@@ -2,8 +2,9 @@ GET         /user                       UserApi.listUsers
 GET         /user/{id}                  UserApi.getUser
 PUT         /user                       UserApi.newUser
 POST        /user/{id}                  UserApi.updateUser
-GET         /user/{email}/{password}    UserApi.registerUser
+POST        /user/{email}/{name}        UserApi.registerUser
 DELETE      /user/{id}                  UserApi.deleteUser
+
 GET         /static*                    Default.handle
 *           *                           Default.refuse
 

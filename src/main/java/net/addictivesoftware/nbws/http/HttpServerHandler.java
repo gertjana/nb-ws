@@ -37,12 +37,10 @@ public class HttpServerHandler extends SimpleChannelUpstreamHandler {
         
         final String path = sanitizeUri(request.getUri());
 
-        // responseText TODO
-        String responseText = "TODO";
-        Path p = routes.getPathForUri(((HttpRequest) e.getMessage()).getMethod().toString(), path);
-        responseText = p.toString();
-        
-        
+
+        Path p = routes.getPathForUri(request.getMethod().toString(), request.getUri());
+        String responseText = p.invoke(request, String.class);
+
         HttpResponse response = new DefaultHttpResponse(HTTP_1_1, OK);
 
         setContentLength(response, responseText.length());

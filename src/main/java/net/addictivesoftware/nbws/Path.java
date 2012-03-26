@@ -3,13 +3,8 @@ package net.addictivesoftware.nbws;
 import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 
-import javax.tools.JavaFileManager;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URLDecoder;
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,7 +17,8 @@ public class Path {
     private LinkedList<Object> paramValues = new LinkedList<Object>();
 
     private static String paramFindPattern = "\\{([a-zA-Z]+)\\}";
-    private static String paramValuePattern = "([a-zA-Z0-9%@.]+)";
+    private static String paramValuePattern = "([a-zA-Z0-9@. ]+)";
+
     private static String wildcardFindPattern = "\\*";
     private static String wildcardValuePattern = ".*";
 
@@ -54,6 +50,7 @@ public class Path {
                 for (int i=1;i<=m.groupCount();i++) {
                     String param = m.group(i);
                     paramValues.add(param);
+
                 }
                 return true;
             }
@@ -91,7 +88,7 @@ public class Path {
         Pattern p = Pattern.compile(paramFindPattern);
         Matcher m = p.matcher(path);
         path = "^" + m.replaceAll(paramValuePattern) + "$";
-
+        
         p = Pattern.compile(wildcardFindPattern);
         m = p.matcher(path);
         path = m.replaceAll(wildcardValuePattern);
@@ -99,14 +96,25 @@ public class Path {
         regexPattern = Pattern.compile(path);
     }
     
-    public <T> T invoke(T t, HttpRequest request) {
-        try {
-            Class clazz = Class.forName(executableMethod.split(".")[0]);
-            Method method = clazz.getMethod(executableMethod.split(".")[1], Object.class);
 
+    public <T> T invoke(HttpRequest request, Class<T> cls) {
+        try {
+            String[] executable = executableMethod.split("\\.", 2);
+            Class[] paramTypes = new Class[paramValues.size()+1];
+
+            paramTypes[0] = HttpRequest.class;
+            int cnt=1;
+            for (Object paramValue : paramValues) {
+                paramTypes[cnt] = paramValue.getClass();
+                cnt++;
+            }
+            
             paramValues.addFirst(request);
 
-            return (T)method.invoke(null, paramValues);
+
+            Class clazz = Class.forName(executable[0]);
+            Method method = clazz.getMethod(executable[1], paramTypes);
+            return cls.cast(method.invoke(null, paramValues.toArray()));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -114,6 +122,11 @@ public class Path {
     }
 
     public String toString() {
-        return "Path {" + this.getHttpMethod() + ", " + this.getPath() + ", " + this.getExecutableMethod() + ", " + this.paramValues + "}";
+        return String.format("%s {%s, %s, %s, %s}",
+                getClass().getSimpleName(),
+                getHttpMethod(),
+                getPath(),
+                getExecutableMethod(),
+                paramValues);
     }
 }
