@@ -1,10 +1,14 @@
 package net.addictivesoftware.nbws;
 
 import org.jboss.netty.handler.codec.http.HttpMethod;
+import org.jboss.netty.handler.codec.http.HttpRequest;
 
+import javax.tools.JavaFileManager;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -15,11 +19,10 @@ public class Path {
     private String path;
     private String executableMethod;
     private Pattern regexPattern;
-    private List<String> params = new ArrayList<String>();
-    private List<String> paramValues = new ArrayList<String>();
+    private LinkedList<Object> paramValues = new LinkedList<Object>();
 
     private static String paramFindPattern = "\\{([a-zA-Z]+)\\}";
-    private static String paramValuePattern = "([a-zA-Z0-9]+)";
+    private static String paramValuePattern = "([a-zA-Z0-9%@.]+)";
     private static String wildcardFindPattern = "\\*";
     private static String wildcardValuePattern = ".*";
 
@@ -42,15 +45,20 @@ public class Path {
     }
     
     public boolean match(String method, String uri) {
-        boolean result = false;
-        if (method.equals("*")
-                || getHttpMethod().toString().equals(method)
-                || getHttpMethod().toString().equals("*")) {
+        if (getHttpMethod().toString().equals(method)
+               || getHttpMethod().toString().equals("*")) {
 
             Matcher m = this.regexPattern.matcher(uri);
-            return m.matches();
+            if (m.matches()) {
+                paramValues.clear();
+                for (int i=1;i<=m.groupCount();i++) {
+                    String param = m.group(i);
+                    paramValues.add(param);
+                }
+                return true;
+            }
         }
-        return result;
+        return false;
     }
     
     
@@ -91,15 +99,21 @@ public class Path {
         regexPattern = Pattern.compile(path);
     }
     
-    public <T> T invoke(T t) {
+    public <T> T invoke(T t, HttpRequest request) {
         try {
             Class clazz = Class.forName(executableMethod.split(".")[0]);
             Method method = clazz.getMethod(executableMethod.split(".")[1], Object.class);
+
+            paramValues.addFirst(request);
 
             return (T)method.invoke(null, paramValues);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public String toString() {
+        return "Path {" + this.getHttpMethod() + ", " + this.getPath() + ", " + this.getExecutableMethod() + ", " + this.paramValues + "}";
     }
 }

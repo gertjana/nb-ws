@@ -1,5 +1,7 @@
 package net.addictivesoftware.nbws.http;
 
+import net.addictivesoftware.nbws.Path;
+import net.addictivesoftware.nbws.Routes;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.*;
 import org.jboss.netty.handler.codec.frame.TooLongFrameException;
@@ -21,7 +23,13 @@ import static org.jboss.netty.handler.codec.http.HttpVersion.*;
 import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 public class HttpServerHandler extends SimpleChannelUpstreamHandler {
+    private Routes routes;
 
+    public HttpServerHandler() {
+        routes = new Routes("/routes");
+    }
+    
+    
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
         System.out.println("receiving request");
@@ -29,14 +37,18 @@ public class HttpServerHandler extends SimpleChannelUpstreamHandler {
         
         final String path = sanitizeUri(request.getUri());
 
-        String responseText = "Calling: " + request.getMethod() + " " + path;
-
+        // responseText TODO
+        String responseText = "TODO";
+        Path p = routes.getPathForUri(((HttpRequest) e.getMessage()).getMethod().toString(), path);
+        responseText = p.toString();
+        
+        
         HttpResponse response = new DefaultHttpResponse(HTTP_1_1, OK);
 
         setContentLength(response, responseText.length());
         Channel ch = e.getChannel();
 
-        // Write the initial line and the header.
+        //Write the initial line and the header.
         ch.write(response);
 
         // Write the content.

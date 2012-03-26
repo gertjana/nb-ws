@@ -25,12 +25,15 @@ public class TestRoutes {
         Assert.assertNotNull(path);
         Assert.assertEquals("Default.refuse", path.getExecutableMethod());
 
+        path = r.getPathForUri("GET", "/user/gertjan.assies%40gmail.com/test");
+        Assert.assertNotNull(path);
+        Assert.assertEquals("UserApi.registerUser", path.getExecutableMethod());
     }
 
     @Test
     public void testPattern() {
-        String pattern = "^/user/([a-zA-Z0-9]+)$";
-        String uri = "/user/4";
+        String pattern = "^/user/([a-zA-Z0-9%.]+)$";
+        String uri = "/user/test%40.com";
         Pattern p = Pattern.compile(pattern);
         Matcher m = p.matcher(uri);
         Assert.assertTrue(m.matches());
