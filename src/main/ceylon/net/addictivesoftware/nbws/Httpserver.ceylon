@@ -1,8 +1,8 @@
-import org.jboss.netty.bootstrap {ServerBootstrap}
+import org.jboss.netty.bootstrap {JServerBootstrap=ServerBootstrap, Bootstrap}
 import org.jboss.netty.channel.socket.nio {NioServerSocketChannelFactory}
 import java.net {InetSocketAddress}
 import java.util.concurrent {Executors{newCachedThreadPool}}
-//import net.addictivesoftware.nbws { HttpServerPipelineFactory }
+import net.addictivesoftware.nbws { HttpServerPipelineFactory }
 
 
 class Httpserver() {
@@ -16,12 +16,12 @@ class Httpserver() {
 				port := p;
 			}
 						
-			ServerBootstrap bootstrap = ServerBootstrap(
+			JServerBootstrap bootstrap = JServerBootstrap(
 				NioServerSocketChannelFactory(
 					newCachedThreadPool(), 
 					newCachedThreadPool()));
 			
-			//bootstrap.setPipelineFactory(HttpServerPipelineFactory());
+			bootstrap.pipelineFactory := HttpServerPipelineFactory();
 			bootstrap.bind(InetSocketAddress(port));
 				        			
     	} else {

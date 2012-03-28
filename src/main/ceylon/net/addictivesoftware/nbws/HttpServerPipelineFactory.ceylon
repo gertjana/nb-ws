@@ -1,19 +1,13 @@
 import org.jboss.netty.handler.codec.http{HttpChunkAggregator,HttpRequestDecoder,HttpResponseEncoder}
 import org.jboss.netty.handler.stream{ChunkedWriteHandler}
-import org.jboss.netty.channel{ChannelPipeline,ChannelPipelineFactory,Channels}
+import org.jboss.netty.channel{ChannelPipeline,ChannelPipelineFactory,Channels{staticChannelPipeline=pipeline}}
 
 
-class HttpServerPipelineFactory() satisfies ChannelPipelineFactory {
+shared class HttpServerPipelineFactory() satisfies ChannelPipelineFactory {
 	shared actual ChannelPipeline pipeline = bottom;
 	
-	shared ChannelPipeline getPipeline() throws Exception {
-
-		ChannelPipeline pipeline = Channels.pipeline();
-
-        // Uncomment the following line if you want HTTPS
-        //SSLEngine engine = SecureChatSslContextFactory.getServerContext().createSSLEngine();
-        //engine.setUseClientMode(false);
-        //pipeline.addLast("ssl", new SslHandler(engine));
+	shared ChannelPipeline getPipeline() {
+		ChannelPipeline pl = staticChannelPipeline();
 
         pipeline.addLast("decoder", HttpRequestDecoder());
         pipeline.addLast("aggregator", HttpChunkAggregator(65536));
@@ -21,7 +15,6 @@ class HttpServerPipelineFactory() satisfies ChannelPipelineFactory {
         pipeline.addLast("chunkedWriter", ChunkedWriteHandler());
 
         //pipeline.addLast("handler", HttpServerHandler());
-        return pipeline;		
+        return pl;		
 	}
-
 }
