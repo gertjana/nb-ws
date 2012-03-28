@@ -2,3 +2,4 @@ target/
 *.iml
 *.iws
 src/main/ceylon/modules/
+modules/
