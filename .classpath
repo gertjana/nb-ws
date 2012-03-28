@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src/main/java"/>
-	<classpathentry kind="src" path="src/test/java"/>
 	<classpathentry kind="src" path="src/main/ceylon"/>
-	<classpathentry kind="lib" path="target/nb-ws-1.0.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/Users/gertjan/.m2/repository/io/netty/netty/3.4.0.Alpha1/netty-3.4.0.Alpha1.jar" sourcepath="/Users/gertjan/.m2/repository/io/netty/netty/3.4.0.Alpha1/netty-3.4.0.Alpha1-sources.jar"/>
 	<classpathentry kind="lib" path="/Users/gertjan/.m2/repository/junit/junit/4.7/junit-4.7.jar"/>
-	<classpathentry kind="output" path="target/modules"/>
+	<classpathentry kind="lib" path="/Users/gertjan/.ceylon/repo/netty/3.4.0/netty-3.4.0.jar"/>
+	<classpathentry kind="output" path="modules"/>
 </classpath>

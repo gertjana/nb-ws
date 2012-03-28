@@ -4,7 +4,7 @@ Module module {
     by = {"Gertjan Assies"};
     dependencies = {
        Import {
-           name = 'netty';
+           name = 'org.jboss.netty';
            version = '3.4.0';
        }
    	};
