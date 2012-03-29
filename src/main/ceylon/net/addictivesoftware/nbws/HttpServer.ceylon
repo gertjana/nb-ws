@@ -1,4 +1,4 @@
-import org.jboss.netty.bootstrap {JServerBootstrap=ServerBootstrap, Bootstrap}
+import org.jboss.netty.bootstrap {ServerBootstrap, Bootstrap}
 import org.jboss.netty.channel.socket.nio {NioServerSocketChannelFactory}
 import java.net {InetSocketAddress}
 import java.util.concurrent {Executors{newCachedThreadPool}}
@@ -16,7 +16,7 @@ class Httpserver() {
 				port := p;
 			}
 
-			JServerBootstrap bootstrap = JServerBootstrap(
+			ServerBootstrap bootstrap = ServerBootstrap(
 				NioServerSocketChannelFactory(
 					newCachedThreadPool(), 
 					newCachedThreadPool()));
@@ -24,8 +24,8 @@ class Httpserver() {
 			bootstrap.pipelineFactory := HttpServerPipelineFactory();
 			bootstrap.bind(InetSocketAddress(port));
 
-    	} else {
-    		print("specify port as the only argument");
-    	}
+		} else {
+			print("specify port as the only argument");
+		}
 	}
 }

@@ -2,7 +2,6 @@ import org.jboss.netty.handler.codec.http{HttpChunkAggregator,HttpRequestDecoder
 import org.jboss.netty.handler.stream{ChunkedWriteHandler}
 import org.jboss.netty.channel{ChannelPipeline,ChannelPipelineFactory,Channels{staticChannelPipeline=pipeline}}
 
-
 shared class HttpServerPipelineFactory() satisfies ChannelPipelineFactory {
 	shared actual ChannelPipeline pipeline = bottom;
 	
@@ -14,7 +13,7 @@ shared class HttpServerPipelineFactory() satisfies ChannelPipelineFactory {
         pipeline.addLast("encoder", HttpResponseEncoder());
         pipeline.addLast("chunkedWriter", ChunkedWriteHandler());
 
-        //pipeline.addLast("handler", HttpServerHandler());
+        pipeline.addLast("handler", HttpServerHandler());
         return pl;		
 	}
 }
