@@ -2,11 +2,11 @@ import org.jboss.netty.bootstrap {ServerBootstrap, Bootstrap}
 import org.jboss.netty.channel.socket.nio {NioServerSocketChannelFactory}
 import java.net {InetSocketAddress}
 import java.util.concurrent {Executors{newCachedThreadPool}}
-import net.addictivesoftware.nbws { HttpServerPipelineFactory }
+//import net.addictivesoftware.nbws { HttpServerPipelineFactory }
 
 
 class Httpserver() {
-	shared variable Integer port := 9000;
+	variable Integer port := 9000;
 
 	shared void run() {
 		String[] args = process.arguments;
