@@ -1,5 +1,5 @@
 import org.jboss.netty.channel{SimpleChannelUpstreamHandler, ChannelHandlerContext, 
-						MessageEvent, Channel, ChannelFuture, ChannelFutureListener{close=\iCLOSE}}
+						MessageEvent, Channel, ChannelFuture, ChannelFutureProgressListener, ChannelFutureListener{close=\iCLOSE}}
 import org.jboss.netty.handler.codec.http{HttpRequest, DefaultHttpResponse, HttpResponse}
 import org.jboss.netty.handler.codec.http{HttpVersion{http11=\iHTTP_1_1}, HttpResponseStatus{ok=\iOK}}
 import org.jboss.netty.buffer{ChannelBuffers{copiedBuffer}}
@@ -18,6 +18,12 @@ shared class HttpServerHandler() extends SimpleChannelUpstreamHandler() {
 		        ch.write(response);	
 		        
 		        ChannelFuture writeFuture = ch.write(copiedBuffer(responseText, "UTF-8"));
+		        
+		        //writeFuture.addListener(ChannelFutureProgressListener() {
+		            
+		        //});
+
+		        
 		        
 				if (!isKeepAlive(request)) {
 		            // Close the connection when the whole content is written out.

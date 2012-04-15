@@ -2,10 +2,9 @@ import org.jboss.netty.bootstrap {ServerBootstrap, Bootstrap}
 import org.jboss.netty.channel.socket.nio {NioServerSocketChannelFactory}
 import java.net {InetSocketAddress}
 import java.util.concurrent {Executors{newCachedThreadPool}}
-//import net.addictivesoftware.nbws { HttpServerPipelineFactory }
 
 
-class Httpserver() {
+//class Httpserver() {
 	variable Integer port := 9000;
 
 	shared void run() {
@@ -15,7 +14,7 @@ class Httpserver() {
 			if (p != -1) {
 				port := p;
 			}
-
+			print("INFO: Starting server on port: " + port.string);
 			ServerBootstrap bootstrap = ServerBootstrap(
 				NioServerSocketChannelFactory(
 					newCachedThreadPool(), 
@@ -23,9 +22,10 @@ class Httpserver() {
 
 			bootstrap.pipelineFactory := HttpServerPipelineFactory();
 			bootstrap.bind(InetSocketAddress(port));
+			print("INFO: Server started");
 
 		} else {
-			print("specify port as the only argument");
+			print("ERROR: Specify port as the only argument");
 		}
 	}
-}
+//}

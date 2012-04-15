@@ -6,13 +6,14 @@ shared class HttpServerPipelineFactory() satisfies ChannelPipelineFactory {
 	shared actual ChannelPipeline pipeline = staticChannelPipeline();
 	
 	shared ChannelPipeline getPipeline() {
-
-        pipeline.addLast("decoder", HttpRequestDecoder());
-        pipeline.addLast("aggregator", HttpChunkAggregator(65536));
-        pipeline.addLast("encoder", HttpResponseEncoder());
-        pipeline.addLast("chunkedWriter", ChunkedWriteHandler());
-
-        pipeline.addLast("handler", HttpServerHandler());
-        return pipeline;		
+		return pipeline;
 	}
+
+    pipeline.addLast("decoder", HttpRequestDecoder());
+    pipeline.addLast("aggregator", HttpChunkAggregator(65536));
+    pipeline.addLast("encoder", HttpResponseEncoder());
+    pipeline.addLast("chunkedWriter", ChunkedWriteHandler());
+
+    pipeline.addLast("handler", HttpServerHandler());
+
 }
