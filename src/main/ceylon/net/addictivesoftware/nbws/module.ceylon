@@ -4,8 +4,8 @@ Module module {
     by = {"Gertjan Assies"};
     dependencies = {
        Import {
-           name = 'org.jboss.netty';
-           version = '3.4.0';
+           name = 'io.netty';
+           version = '3.5.0.Final';
        },
        Import {
            name = 'junit';
