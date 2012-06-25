@@ -4,10 +4,6 @@ import org.jboss.netty.channel{ChannelPipeline,ChannelPipelineFactory,Channels{s
 
 shared class HttpServerPipelineFactory() satisfies ChannelPipelineFactory {
 	shared actual ChannelPipeline pipeline = staticChannelPipeline();
-	
-	shared ChannelPipeline getPipeline() {
-		return pipeline;
-	}
 
     pipeline.addLast("decoder", HttpRequestDecoder());
     pipeline.addLast("aggregator", HttpChunkAggregator(65536));
